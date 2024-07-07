@@ -1,0 +1,26 @@
+port: ${SERVER_PORT}
+serverTimeout: ${SERVER_TIMEOUT}
+appMode: ${GO_ENV} 
+
+token:
+  expire: ${TOKEN_EXPIRE}
+  issuer: ${TOKEN_ISSUER}
+
+server:
+  publicKey: ${SERVER_PUBLIC_KEY}
+  privateKey: ${SERVER_PRIVATE_KEY}
+
+db:
+  host: ${MYSQL_HOST}
+  username: ${MYSQL_USERNAME}
+  password: ${MYSQL_PASSWORD}
+  name: ${MYSQL_DBNAME}
+  minPool: ${MYSQL_MIN_POOL}
+  maxPool: ${MYSQL_MAX_POOL}
+
+client:
+  # gather the public_key.pem from client
+  # generate key and secret for client
+  key: ${CLIENT_KEY}
+  secret: ${CLIENT_SECRET}
+  publicKey: ${CLIENT_PUBLIC_KEY}

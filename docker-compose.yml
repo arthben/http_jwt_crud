@@ -1,0 +1,51 @@
+version: '3'
+
+networks:
+  todos_network:
+
+volumes:
+  databases:  
+
+services:
+  todo_api:
+    container_name: go_http_jwt_todo_api_crud
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - SERVER_PORT=6400
+      - SERVER_TIMEOUT=60
+      - GO_ENV=development
+      - TOKEN_EXPIRE=900
+      - TOKEN_ISSUER=id.internal.net
+      - SERVER_PUBLIC_KEY=/configs/CREDENTIALS/public_key.pem
+      - SERVER_PRIVATE_KEY=/configs/CREDENTIALS/private_key.pem
+      - CLIENT_KEY=4719420b9c679db0078aea93532b2845
+      - CLIENT_SECRET=623f665ce389b7fd1df21747ed893c84
+      - CLIENT_PUBLIC_KEY=/configs/CREDENTIALS/partner_public_key.pem
+      - MYSQL_HOST=db
+      - MYSQL_USERNAME=exampleuser
+      - MYSQL_PASSWORD=examplepass
+      - MYSQL_DBNAME=db_todo
+      - MYSQL_MIN_POOL=1
+      - MYSQL_MAX_POOL=10
+    ports:
+      - 6400:6400
+    networks:
+      - todos_network
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    restart: always
+    volumes:
+      - databases:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: $MYSQL_DBNAME
+      MYSQL_USER: $MYSQL_USERNAME
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    networks:
+      - todos_network
