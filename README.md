@@ -6,6 +6,7 @@
 - JWT Authentication ( Bearer )
 - Signature to validate request
 - Simple CRUD with SQLX package
+- Swagger API Documentation
 
 ## Table structure
 ```sql
@@ -24,10 +25,15 @@ CREATE TABLE todos (
 ## Swagger ( API Documentation )
 Install swagger with Golang
 ```console
-go get -u github.com/swaggo/swag
+$ go get -u github.com/swaggo/swag
 ```
 
 To generate docs, run this command
 ```console
 $ swag init -g api/handlers/handlers.go
+```
+
+To view swagger documentation, open in the browser 
+```console
+http://[ip:port]/swagger/index.html
 ```
