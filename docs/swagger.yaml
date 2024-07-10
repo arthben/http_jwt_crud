@@ -1,0 +1,160 @@
+definitions:
+  auth.TokenResponse:
+    properties:
+      accessToken:
+        type: string
+      expiresIn:
+        type: string
+      responseCode:
+        type: string
+      responseMessage:
+        type: string
+      tokenType:
+        type: string
+    type: object
+  database.TableTodos:
+    properties:
+      completedDate:
+        type: string
+      createdDate:
+        type: string
+      detail:
+        type: string
+      id:
+        type: string
+      statusCompleted:
+        type: string
+      title:
+        type: string
+      updatedDate:
+        type: string
+    type: object
+  response.Message:
+    properties:
+      responseCode:
+        type: string
+      responseMessage:
+        type: string
+    type: object
+  todo.AddTodosRequest:
+    properties:
+      detail_todo:
+        maxLength: 1024
+        type: string
+      title:
+        maxLength: 256
+        minLength: 1
+        type: string
+    required:
+    - title
+    type: object
+info:
+  contact:
+    email: yohanescatur@gmail.com
+    name: Yohanes Catur
+    url: www.linkedin.com/in/yohanescatur
+  description: Demonstrate HTTP with Middleware, JWT, SQLX and slog package
+  title: HTTP JWT CRUD
+  version: "1.0"
+paths:
+  /v1.0/access-token:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: application/json
+        in: header
+        name: Content-Type
+        required: true
+        type: string
+      - description: Client key provided by server
+        in: header
+        name: X-Client-Key
+        required: true
+        type: string
+      - description: 'format: 2006-01-02T15:04:05+07:00'
+        in: header
+        name: X-Timestamp
+        required: true
+        type: string
+      - description: Generated Signature
+        in: header
+        name: X-Signature
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Message'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Message'
+      summary: Get Access Token
+      tags:
+      - Token
+  /v1.0/todo:
+    post:
+      consumes:
+      - application/json
+      description: "## Description \nAdd new task to todo list.\n\n## Response Code\n|
+        HTTP  | Service | Code | Description                  |\n| ----- | -------
+        | ---- | -----------------------------|\n|  200  |    24   |  -   | Success
+        \                     |\n|  400  |    24   |  00  | Bad Request / Unauthorized
+        \  |\n|  400  |    24   |  01  | Invalid Field Format         |\n|  400  |
+        \   24   |  02  | Missing Mandatory Field      |\n|  500  |    24   |  00
+        \ | Internal Server Error        |"
+      parameters:
+      - description: application/json
+        in: header
+        name: Content-Type
+        required: true
+        type: string
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Client Key provided by server
+        in: header
+        name: X-Client-Key
+        required: true
+        type: string
+      - description: 'format: 2006-01-02T15:04:05+07:00'
+        in: header
+        name: X-Timestamp
+        required: true
+        type: string
+      - description: "123425234"
+        in: header
+        name: X-Signature
+        required: true
+        type: string
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/todo.AddTodosRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.TableTodos'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Message'
+      summary: Add Todo item
+      tags:
+      - Todo
+swagger: "2.0"

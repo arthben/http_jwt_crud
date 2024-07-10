@@ -1,13 +1,13 @@
 # http_jwt_crud
 
-## This repo demonstrate :
+## This repo demonstrate
 - Go HTTP ( with middleware )
 - Structure Log ( slog package )
 - JWT Authentication ( Bearer )
 - Signature to validate request
 - Simple CRUD with SQLX package
 
-## Table structure :
+## Table structure
 ```sql
 CREATE TABLE todos (
 	id varchar(64),
@@ -19,4 +19,15 @@ CREATE TABLE todos (
 	completed_date timestamp,
 	primary key(id)
 ) engine=Innodb;
+```
+
+## Swagger ( API Documentation )
+Install swagger with Golang
+```console
+go get -u github.com/swaggo/swag
+```
+
+To generate docs, run this command
+```console
+$ swag init -g api/handlers/handlers.go
 ```

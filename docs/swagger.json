@@ -1,0 +1,230 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Demonstrate HTTP with Middleware, JWT, SQLX and slog package",
+        "title": "HTTP JWT CRUD",
+        "contact": {
+            "name": "Yohanes Catur",
+            "url": "www.linkedin.com/in/yohanescatur",
+            "email": "yohanescatur@gmail.com"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/v1.0/access-token": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Token"
+                ],
+                "summary": "Get Access Token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "application/json",
+                        "name": "Content-Type",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Client key provided by server",
+                        "name": "X-Client-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "format: 2006-01-02T15:04:05+07:00",
+                        "name": "X-Timestamp",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Generated Signature",
+                        "name": "X-Signature",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.TokenResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1.0/todo": {
+            "post": {
+                "description": "## Description \nAdd new task to todo list.\n\n## Response Code\n| HTTP  | Service | Code | Description                  |\n| ----- | ------- | ---- | -----------------------------|\n|  200  |    24   |  -   | Success                      |\n|  400  |    24   |  00  | Bad Request / Unauthorized   |\n|  400  |    24   |  01  | Invalid Field Format         |\n|  400  |    24   |  02  | Missing Mandatory Field      |\n|  500  |    24   |  00  | Internal Server Error        |",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo"
+                ],
+                "summary": "Add Todo item",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "application/json",
+                        "name": "Content-Type",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Client Key provided by server",
+                        "name": "X-Client-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "format: 2006-01-02T15:04:05+07:00",
+                        "name": "X-Timestamp",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "123425234",
+                        "name": "X-Signature",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/todo.AddTodosRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/database.TableTodos"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Message"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "auth.TokenResponse": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "expiresIn": {
+                    "type": "string"
+                },
+                "responseCode": {
+                    "type": "string"
+                },
+                "responseMessage": {
+                    "type": "string"
+                },
+                "tokenType": {
+                    "type": "string"
+                }
+            }
+        },
+        "database.TableTodos": {
+            "type": "object",
+            "properties": {
+                "completedDate": {
+                    "type": "string"
+                },
+                "createdDate": {
+                    "type": "string"
+                },
+                "detail": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "statusCompleted": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedDate": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Message": {
+            "type": "object",
+            "properties": {
+                "responseCode": {
+                    "type": "string"
+                },
+                "responseMessage": {
+                    "type": "string"
+                }
+            }
+        },
+        "todo.AddTodosRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "detail_todo": {
+                    "type": "string",
+                    "maxLength": 1024
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "minLength": 1
+                }
+            }
+        }
+    }
+}
