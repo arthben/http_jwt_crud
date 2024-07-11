@@ -12,9 +12,9 @@ server:
 
 db:
   host: ${MYSQL_HOST}
-  username: ${MYSQL_USERNAME}
+  username: ${MYSQL_USER}
   password: ${MYSQL_PASSWORD}
-  name: ${MYSQL_DBNAME}
+  name: ${MYSQL_DATABASE}
   minPool: ${MYSQL_MIN_POOL}
   maxPool: ${MYSQL_MAX_POOL}
 

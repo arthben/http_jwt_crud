@@ -8,4 +8,7 @@ run:
 
 build:
 	swag init -g api/handlers/handlers.go --markdownFiles docs
-	CC=${CC} GOOS=${OS} GOARCH=${ARCH} CGO_ENABLED=1 go build --ldflags=${LDFLAGS} -v -buildvcs=false -o ${OUTPUT} cmd/http_jwt_crud/main.go
+	GOOS=${OS} GOARCH=${ARCH} CGO_ENABLED=0 go build --ldflags=${LDFLAGS} -v -buildvcs=false -o ${OUTPUT} cmd/http_jwt_crud/main.go
+
+test:
+	cd tests; go test -v -count=1

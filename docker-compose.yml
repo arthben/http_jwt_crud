@@ -1,10 +1,12 @@
 version: '3'
 
 networks:
-  todos_network:
+  my_local_docker:
+
 
 volumes:
-  databases:  
+  databases:
+
 
 services:
   todo_api:
@@ -25,15 +27,15 @@ services:
       - CLIENT_SECRET=623f665ce389b7fd1df21747ed893c84
       - CLIENT_PUBLIC_KEY=/configs/CREDENTIALS/partner_public_key.pem
       - MYSQL_HOST=db
-      - MYSQL_USERNAME=exampleuser
-      - MYSQL_PASSWORD=examplepass
-      - MYSQL_DBNAME=db_todo
+      - MYSQL_DATABASE=db_todo
+      - MYSQL_USER=todo_user
+      - MYSQL_PASSWORD=todo_pass
       - MYSQL_MIN_POOL=1
       - MYSQL_MAX_POOL=10
     ports:
       - 6400:6400
     networks:
-      - todos_network
+      - my_local_docker
     depends_on:
       - db
 
@@ -42,10 +44,11 @@ services:
     restart: always
     volumes:
       - databases:/var/lib/mysql
+      - ./scripts/db_init:/docker-entrypoint-initdb.d/:ro
     environment:
-      MYSQL_DATABASE: $MYSQL_DBNAME
-      MYSQL_USER: $MYSQL_USERNAME
-      MYSQL_PASSWORD: $MYSQL_PASSWORD
-      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+      MYSQL_DATABASE: db_todo
+      MYSQL_USER: todo_user
+      MYSQL_PASSWORD: todo_pass
+      MYSQL_ROOT_PASSWORD: root
     networks:
-      - todos_network
+      - my_local_docker

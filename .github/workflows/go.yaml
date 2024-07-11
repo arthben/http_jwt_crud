@@ -1,0 +1,26 @@
+name: Go Build & Test
+on:
+  pull_request:
+    branches: [ "main" ]
+
+defaults:
+ run:
+  working-directory: ./tests
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22.2'
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Test
+      run: |
+        go test -v -count=1

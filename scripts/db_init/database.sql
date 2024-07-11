@@ -1,3 +1,4 @@
+USE db_todo;
 CREATE TABLE todos (
 	id varchar(64),
 	title varchar(256),

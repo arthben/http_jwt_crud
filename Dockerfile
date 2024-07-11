@@ -3,6 +3,7 @@ FROM golang:1.22.5-alpine3.19 AS builder
 WORKDIR /build
 COPY . .
 RUN go mod download
+RUN go get -u github.com/swaggo/swag
 RUN go build -o ./http_jwt_crud ./cmd/http_jwt_crud/main.go
 
 FROM alpine:latest  
