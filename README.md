@@ -7,6 +7,7 @@
 - Signature to validate request
 - Simple CRUD with SQLX package
 - Swagger API Documentation
+- CI with Github Action on Pull Request 
 
 ## Table structure
 ```sql
