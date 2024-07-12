@@ -3,6 +3,7 @@ package todo
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"log/slog"
 	"net/http"
 	"time"
@@ -71,7 +72,11 @@ func (t *TodoService) Add(w http.ResponseWriter, r *http.Request) (*dbs.TableTod
 		StatusCompleted: UnCompleted,
 	}
 	if err := dbs.AddTodo(t.db, context.TODO(), tbl); err != nil {
-		logger.Error("AddTodo", slog.String("error", err.Error()))
+		if logger != nil {
+			logger.Error("AddTodo", slog.String("error", err.Error()))
+		} else {
+			log.Fatalf("AddTodo %v", err)
+		}
 		return nil, &res.Message{
 			HttpStatus:      http.StatusInternalServerError,
 			ResponseCode:    "00",
