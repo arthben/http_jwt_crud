@@ -12,8 +12,41 @@ defaults:
   working-directory: ./tests
 
 jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
 
-  build:
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22.2'
+
+    - name: Create .env file
+      run: |
+        touch .env
+        echo SERVER_PORT=${{ vars.SERVER_PORT }} >> .env
+        echo SERVER_TIMEOUT=${{ vars.SERVER_TIMEOUT }} >> .env
+        echo GO_ENV=${{ vars.GO_ENV }} >> .env
+        echo TOKEN_EXPIRE=${{ vars.TOKEN_EXPIRE }} >> .env
+        echo TOKEN_ISSUER=${{ vars.TOKEN_ISSUER }} >> .env
+        echo SERVER_PUBLIC_KEY=${{ vars.SERVER_PUBLIC_KEY }} >> .env
+        echo SERVER_PRIVATE_KEY=${{ vars.SERVER_PRIVATE_KEY }} >> .env
+        echo CLIENT_KEY=${{ vars.CLIENT_KEY }} >> .env
+        echo CLIENT_SECRET=${{ vars.CLIENT_SECRET }} >> .env
+        echo CLIENT_PUBLIC_KEY=${{ vars.CLIENT_PUBLIC_KEY }} >> .env
+        echo MYSQL_HOST=${{ vars.MYSQL_HOST }} >> .env
+        echo MYSQL_DATABASE=${{ vars.MYSQL_DATABASE }} >> .env
+        echo MYSQL_USER=${{ vars.MYSQL_USER }} >> .env
+        echo MYSQL_PASSWORD=${{ vars.MYSQL_PASSWORD }} >> .env
+        echo MYSQL_MIN_POOL=${{ vars.MYSQL_MIN_POOL }} >> .env
+        echo MYSQL_MAX_POOL=${{ vars.MYSQL_MAX_POOL }} >> .env
+
+    - name: Unit test
+      run: go test -v -count=1
+
+  job2:
+    needs: job1
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -25,6 +58,3 @@ jobs:
 
     - name: Build
       run: go build -v ./...
-
-    - name: Test
-      run: go test -v -count=1
