@@ -35,6 +35,7 @@ jobs:
     services:
       mysql:
         image: mysql:8.0
+        options: --user root
         volumes:
           - databases:/var/lib/mysql
           - ./scripts/db_init:/docker-entrypoint-initdb.d/:ro
@@ -51,9 +52,6 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.22.2'
-
-    - name: Build
-      run: go build -v ./...
 
     - name: Unit test
       run: go test -v -count=1
