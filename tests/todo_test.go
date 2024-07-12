@@ -125,7 +125,7 @@ func TestGetToken(t *testing.T) {
 				Signature:   "signature123123123",
 			},
 			expectRespCode: "4017300",
-			statusCode:     400,
+			statusCode:     401,
 		},
 	}
 
