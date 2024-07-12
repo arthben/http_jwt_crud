@@ -29,6 +29,23 @@ func generateIDTodos() string {
 	return uuid.New().String()
 }
 
+func validateHeader(r *http.Request, cfg *config.EnvParams) (*RequestHeader, *res.Message) {
+	header, errCode := validateHeaderValue(r)
+	if errCode != nil {
+		return nil, errCode
+	}
+
+	if errCode := validateClientKey(cfg, header.ClientKey); errCode != nil {
+		return nil, errCode
+	}
+
+	if errCode := validateAccessToken(cfg, header.Authorization); errCode != nil {
+		return nil, errCode
+	}
+
+	return header, nil
+}
+
 func validateClientKey(cfg *config.EnvParams, clientKey string) *res.Message {
 	if cfg.Client.Key != clientKey {
 		return res.BadResponse(http.StatusUnauthorized, ServiceCode, "00", "Unauthorized. Unknown Client Key")
@@ -74,46 +91,7 @@ func validateSignature(header *RequestHeader, body []byte, reqPath string, metho
 	return nil
 }
 
-func validateBody(w http.ResponseWriter, r *http.Request) (*AddTodosRequest, *res.Message) {
-	var payload AddTodosRequest
-
-	if err := bindhttp.BindBody(w, r, &payload); err != nil {
-		return nil, res.BadResponse(http.StatusBadRequest, ServiceCode, "00", "Bad Request")
-	}
-
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	if err := validate.Struct(&payload); err != nil {
-		// check if the struct is nill
-		if _, ok := err.(*validator.InvalidValidationError); ok {
-			return nil, res.BadResponse(http.StatusBadRequest, ServiceCode, "02", "Unauthorized. Bad Request")
-		}
-
-		for _, ve := range err.(validator.ValidationErrors) {
-			switch ve.Field() {
-			case "Title":
-				if ve.Tag() == "required" {
-					return nil, res.BadResponse(http.StatusBadRequest, ServiceCode, "02", "Missing Mandatory Field title")
-				}
-				if ve.Tag() == "min" || ve.Tag() == "max" {
-					return nil, res.BadResponse(http.StatusBadRequest, ServiceCode, "01", "Invalid Field Format. Length of field value")
-				}
-
-			case "DetailTodo":
-				if ve.Tag() == "max" {
-					return nil, res.BadResponse(http.StatusBadRequest, ServiceCode, "01", "Invalid Field Format. Length of field value")
-				}
-
-			default:
-				return nil, res.BadResponse(http.StatusBadRequest, ServiceCode, "00", "Unauthorized. Bad Request")
-
-			}
-		}
-	}
-
-	return &payload, nil
-}
-
-func validateHeader(r *http.Request) (*RequestHeader, *res.Message) {
+func validateHeaderValue(r *http.Request) (*RequestHeader, *res.Message) {
 	var header RequestHeader
 
 	if err := bindhttp.BindHeader(r.Header, &header); err != nil {
@@ -180,4 +158,43 @@ func validateHeader(r *http.Request) (*RequestHeader, *res.Message) {
 	}
 
 	return &header, nil
+}
+
+func validateAddBody(w http.ResponseWriter, r *http.Request) (*AddTodosRequest, *res.Message) {
+	var payload AddTodosRequest
+
+	if err := bindhttp.BindBody(w, r, &payload); err != nil {
+		return nil, res.BadResponse(http.StatusBadRequest, ServiceCode, "00", "Bad Request")
+	}
+
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	if err := validate.Struct(&payload); err != nil {
+		// check if the struct is nill
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			return nil, res.BadResponse(http.StatusBadRequest, ServiceCode, "02", "Unauthorized. Bad Request")
+		}
+
+		for _, ve := range err.(validator.ValidationErrors) {
+			switch ve.Field() {
+			case "Title":
+				if ve.Tag() == "required" {
+					return nil, res.BadResponse(http.StatusBadRequest, ServiceCode, "02", "Missing Mandatory Field title")
+				}
+				if ve.Tag() == "min" || ve.Tag() == "max" {
+					return nil, res.BadResponse(http.StatusBadRequest, ServiceCode, "01", "Invalid Field Format. Length of field value")
+				}
+
+			case "DetailTodo":
+				if ve.Tag() == "max" {
+					return nil, res.BadResponse(http.StatusBadRequest, ServiceCode, "01", "Invalid Field Format. Length of field value")
+				}
+
+			default:
+				return nil, res.BadResponse(http.StatusBadRequest, ServiceCode, "00", "Unauthorized. Bad Request")
+
+			}
+		}
+	}
+
+	return &payload, nil
 }

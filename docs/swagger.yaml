@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   auth.TokenResponse:
     properties:
@@ -53,7 +54,9 @@ info:
     email: yohanescatur@gmail.com
     name: Yohanes Catur
     url: www.linkedin.com/in/yohanescatur
-  description: Demonstrate HTTP with Middleware, JWT, SQLX and slog package
+  description: |-
+    Demonstrate HTTP with Middleware, JWT, SQLX and slog package
+    Response Code Format : HTTP Status - Service Code - Response Code
   title: HTTP JWT CRUD
   version: "1.0"
 paths:
@@ -101,6 +104,56 @@ paths:
       tags:
       - Token
   /v1.0/todo:
+    get:
+      consumes:
+      - application/json
+      description: Get list of todo
+      parameters:
+      - description: application/json
+        in: header
+        name: Content-Type
+        required: true
+        type: string
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Client Key provided by server
+        in: header
+        name: X-Client-Key
+        required: true
+        type: string
+      - description: 'format: 2006-01-02T15:04:05+07:00'
+        in: header
+        name: X-Timestamp
+        required: true
+        type: string
+      - description: "123425234"
+        in: header
+        name: X-Signature
+        required: true
+        type: string
+      - description: ID of todo
+        in: path
+        name: ID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/database.TableTodos'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Message'
+      summary: Todo List
+      tags:
+      - Todo
     post:
       consumes:
       - application/json

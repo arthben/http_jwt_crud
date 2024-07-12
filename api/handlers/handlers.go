@@ -6,7 +6,7 @@ import (
 	"github.com/arthben/http_jwt_crud/api/auth"
 	"github.com/arthben/http_jwt_crud/api/todo"
 
-	"github.com/arthben/http_jwt_crud/docs"
+	_ "github.com/arthben/http_jwt_crud/docs"
 	"github.com/arthben/http_jwt_crud/internal/config"
 	"github.com/arthben/http_jwt_crud/internal/response"
 
@@ -35,9 +35,11 @@ func NewHandlers(
 // @title HTTP JWT CRUD
 // @version 1.0
 // @description Demonstrate HTTP with Middleware, JWT, SQLX and slog package
+// @description Response Code Format : HTTP Status - Service Code - Response Code
 // @contact.name Yohanes Catur
 // @contact.url www.linkedin.com/in/yohanescatur
 // @contact.email yohanescatur@gmail.com
+// @Basepath /
 func (h *Handlers) BuildRouter() (http.Handler, error) {
 	// Load swagger
 	h.InitSwagger()
@@ -45,19 +47,12 @@ func (h *Handlers) BuildRouter() (http.Handler, error) {
 	h.mux.HandleFunc("GET /halo", halo)
 	h.mux.HandleFunc("POST /v1.0/access-token", h.GetAccessToken)
 	h.mux.HandleFunc("POST /v1.0/todo", h.NewTodo)
+	h.mux.HandleFunc("GET /v1.0/todo/{ID}", h.GetTodoList)
 
 	return http.Handler(h.mux), nil
 }
 
 func (h *Handlers) InitSwagger() {
-	docs.SwaggerInfo.Title = "HTTP JWT CRUD Documentation"
-	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.BasePath = "/"
-	docs.SwaggerInfo.Schemes = []string{"http"}
-	docs.SwaggerInfo.Description = `API For Todo.<br />
-	Response Code format : 2007300<br />
-	Respon Code pattern : HTTP Status - Service Code - Response Code`
-
 	h.mux.HandleFunc("GET /swagger/", httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"),
 		httpSwagger.DeepLinking(true),
@@ -113,6 +108,31 @@ func (h *Handlers) NewTodo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Write(w).JSON(tb)
+}
+
+// GetTodoList godoc
+// @Summary Todo List
+// @Description Get list of todo
+// @Tags Todo
+// @Accept json
+// @Produce json
+// @Param Content-Type  header string true "application/json"
+// @Param Authorization header string true "Bearer token"
+// @Param X-Client-Key  header string true "Client Key provided by server"
+// @Param X-Timestamp   header string true "format: 2006-01-02T15:04:05+07:00"
+// @Param X-Signature   header string true "123425234"
+// @Param ID path string false "ID of todo"
+// @Success 200 {object} []database.TableTodos
+// @Failure 404 {object} response.Message
+// @Router /v1.0/todo [GET]
+func (h *Handlers) GetTodoList(w http.ResponseWriter, r *http.Request) {
+	tbs, errCode := h.todo.Get(w, r)
+	if errCode != nil {
+		response.Write(w).AbortWithJSON(errCode)
+		return
+	}
+
+	response.Write(w).JSON(tbs)
 }
 
 func halo(w http.ResponseWriter, r *http.Request) {

@@ -84,6 +84,79 @@ const docTemplate = `{
             }
         },
         "/v1.0/todo": {
+            "get": {
+                "description": "Get list of todo",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo"
+                ],
+                "summary": "Todo List",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "application/json",
+                        "name": "Content-Type",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Client Key provided by server",
+                        "name": "X-Client-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "format: 2006-01-02T15:04:05+07:00",
+                        "name": "X-Timestamp",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "123425234",
+                        "name": "X-Signature",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID of todo",
+                        "name": "ID",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/database.TableTodos"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Message"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "## Description \nAdd new task to todo list.\n\n## Response Code\n| HTTP  | Service | Code | Description                  |\n| ----- | ------- | ---- | -----------------------------|\n|  200  |    24   |  -   | Success                      |\n|  400  |    24   |  00  | Bad Request / Unauthorized   |\n|  400  |    24   |  01  | Invalid Field Format         |\n|  400  |    24   |  02  | Missing Mandatory Field      |\n|  500  |    24   |  00  | Internal Server Error        |",
                 "consumes": [
@@ -241,10 +314,10 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "HTTP JWT CRUD",
-	Description:      "Demonstrate HTTP with Middleware, JWT, SQLX and slog package",
+	Description:      "Demonstrate HTTP with Middleware, JWT, SQLX and slog package\nResponse Code Format : HTTP Status - Service Code - Response Code",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

@@ -29,24 +29,30 @@ func NewTodoService(db *sqlx.DB, cfg *config.EnvParams) *TodoService {
 	return &TodoService{db: db, cfg: cfg}
 }
 
-func (t *TodoService) Add(w http.ResponseWriter, r *http.Request) (*dbs.TableTodos, *res.Message) {
-	logger, _ := logging.FromContext(r.Context())
-	header, errCode := validateHeader(r)
+func (t *TodoService) Get(w http.ResponseWriter, r *http.Request) ([]*dbs.TableTodos, *res.Message) {
+	_, errCode := validateHeader(r, t.cfg)
 	if errCode != nil {
 		return nil, errCode
 	}
 
-	// validate client Key
-	if errCodeClient := validateClientKey(t.cfg, header.ClientKey); errCodeClient != nil {
-		return nil, errCodeClient
+	// get the ID
+	id := r.PathValue("ID")
+	resp, err := dbs.ListTodo(t.db, context.TODO(), id)
+	if err != nil {
+		return nil, res.BadResponse(http.StatusNotFound, ServiceCode, "00", "No Data Found")
 	}
 
-	// validate access token
-	if errCodeToken := validateAccessToken(t.cfg, header.Authorization); errCodeToken != nil {
-		return nil, errCodeToken
+	return resp, nil
+}
+
+func (t *TodoService) Add(w http.ResponseWriter, r *http.Request) (*dbs.TableTodos, *res.Message) {
+	logger, _ := logging.FromContext(r.Context())
+	header, errCode := validateHeader(r, t.cfg)
+	if errCode != nil {
+		return nil, errCode
 	}
 
-	payload, errCode := validateBody(w, r)
+	payload, errCode := validateAddBody(w, r)
 	if errCode != nil {
 		return nil, errCode
 	}
@@ -77,11 +83,7 @@ func (t *TodoService) Add(w http.ResponseWriter, r *http.Request) (*dbs.TableTod
 		} else {
 			log.Fatalf("AddTodo %v", err)
 		}
-		return nil, &res.Message{
-			HttpStatus:      http.StatusInternalServerError,
-			ResponseCode:    "00",
-			ResponseMessage: "Error Internal Server",
-		}
+		return nil, res.BadResponse(http.StatusInternalServerError, ServiceCode, "00", "Error Internal Server")
 	}
 
 	return tbl, nil
