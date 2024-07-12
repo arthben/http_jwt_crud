@@ -37,7 +37,6 @@ jobs:
         image: mysql:8.0
         volumes:
           - databases:/var/lib/mysql
-          - ${{ github.workspace }}/scripts/db_init:/docker-entrypoint-initdb.d/:ro
         env:
           MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
         ports:
@@ -46,6 +45,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Run mysql init script
+      run: |
+        mysql --protocol=tcp -h localhost -P 3306 -u root -p${{ vars.MYSQL_PASSWORD }} -e "$(cat $(find ./ -name database.sql))"
 
     - name: Set up Go
       uses: actions/setup-go@v4
