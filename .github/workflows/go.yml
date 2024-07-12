@@ -11,7 +11,7 @@ defaults:
  run:
   working-directory: ./tests
 
-env:
+environment:
   SERVER_PORT: ${{ vars.SERVER_PORT }}
   SERVER_TIMEOUT: ${{ vars.SERVER_TIMEOUT }}
   GO_ENV: ${{ vars.GO_ENV }}
@@ -32,6 +32,22 @@ env:
 jobs:
   job1:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        restart: always
+        volumes:
+          - databases:/var/lib/mysql
+          - ./scripts/db_init:/docker-entrypoint-initdb.d/:ro
+        environment:
+          MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ vars.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
     - uses: actions/checkout@v4
 
