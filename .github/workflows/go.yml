@@ -49,7 +49,7 @@ jobs:
 
     - name: Run mysql init script
       run: |
-        mysql --protocol=tcp -h localhost -P 3306 -u${{ vars.MYSQL_USER }} -p${{ vars.MYSQL_PASSWORD }} -e "$(cat ./scripts/db_init/database.sql)"
+        mysql --protocol=tcp -h localhost -P 3306 -u${{ vars.MYSQL_USER }} -p${{ vars.MYSQL_PASSWORD }} -e "$(cat ../scripts/db_init/database.sql)"
 
     - name: Set up Go
       uses: actions/setup-go@v4
