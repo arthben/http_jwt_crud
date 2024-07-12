@@ -35,7 +35,6 @@ jobs:
     services:
       mysql:
         image: mysql:8.0
-        options: --user root
         volumes:
           - databases:/var/lib/mysql
           - ./scripts/db_init:/docker-entrypoint-initdb.d/:ro
@@ -43,7 +42,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: --user root --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
     - uses: actions/checkout@v4
