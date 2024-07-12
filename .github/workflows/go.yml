@@ -38,10 +38,7 @@ jobs:
         volumes:
           - databases:/var/lib/mysql
           - ./scripts/db_init:/docker-entrypoint-initdb.d/:ro
-        environment:
-          MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}
-          MYSQL_USER: ${{ vars.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
+        env:
           MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
         ports:
           - 3306:3306
