@@ -37,7 +37,7 @@ jobs:
         image: mysql:8.0
         volumes:
           - databases:/var/lib/mysql
-          - ./scripts/db_init:/docker-entrypoint-initdb.d/:ro
+          - ${{ github.workspace }}/scripts/db_init:/docker-entrypoint-initdb.d/:ro
         env:
           MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
         ports:
