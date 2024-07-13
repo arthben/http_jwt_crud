@@ -38,7 +38,7 @@ func (t *TodoService) Get(w http.ResponseWriter, r *http.Request) ([]*dbs.TableT
 	// get the ID
 	id := r.PathValue("ID")
 	resp, err := dbs.ListTodo(t.db, context.TODO(), id)
-	if err != nil {
+	if err != nil && id != "" {
 		return nil, res.BadResponse(http.StatusNotFound, ServiceCode, "00", "No Data Found")
 	}
 

@@ -173,6 +173,106 @@ func TestGetToken(t *testing.T) {
 	}
 }
 
+func TestGetTodo(t *testing.T) {
+	now := time.Now()
+	srv := handlers.NewHandlers(db, cfg)
+
+	accessToken, err := getToken(srv, now.Format(TSLayout))
+	if err != nil {
+		t.Error("Failed Get Access Token")
+		return
+	}
+
+	scenario := []struct {
+		name           string
+		header         *todo.RequestHeader
+		todoID         string
+		expectRespCode string
+		statusCode     int
+	}{
+		{
+			name: "Success. Get All Todos ID",
+			header: &todo.RequestHeader{
+				ContentType:   "application/json",
+				Authorization: "Bearer " + accessToken,
+				ClientKey:     cfg.Client.Key,
+				Timestamp:     now.Format(TSLayout),
+				Signature:     "signature",
+			},
+			todoID:         "",
+			expectRespCode: "2002400",
+			statusCode:     http.StatusOK,
+		},
+		{
+			name: "Success. Get Single Todos ID",
+			header: &todo.RequestHeader{
+				ContentType:   "application/json",
+				Authorization: "Bearer " + accessToken,
+				ClientKey:     cfg.Client.Key,
+				Timestamp:     now.Format(TSLayout),
+				Signature:     "signature",
+			},
+			todoID:         "uuid",
+			expectRespCode: "2002400",
+			statusCode:     http.StatusOK,
+		},
+		{
+			name: "Failed. Invalid Access Token",
+			header: &todo.RequestHeader{
+				ContentType:   "application/json",
+				Authorization: "Bearer ABC" + accessToken,
+				ClientKey:     cfg.Client.Key,
+				Timestamp:     now.Format(TSLayout),
+				Signature:     "signature",
+			},
+			todoID:         "",
+			expectRespCode: "4012401",
+			statusCode:     http.StatusUnauthorized,
+		},
+	}
+
+	for _, ts := range scenario {
+		var tempID string
+
+		t.Run(ts.name, func(t *testing.T) {
+			request := httptest.NewRequest(http.MethodGet, "/v1.0/todo", nil)
+			request.Header.Add("Content-Type", ts.header.ContentType)
+			request.Header.Add("Authorization", ts.header.Authorization)
+			request.Header.Add("X-CLIENT-KEY", ts.header.ClientKey)
+			request.Header.Add("X-TIMESTAMP", ts.header.Timestamp)
+			request.Header.Add("X-SIGNATURE", "signature")
+
+			if ts.todoID != "" {
+				request.SetPathValue("ID", tempID)
+			}
+
+			responseRecorder := httptest.NewRecorder()
+
+			srv.GetTodoList(responseRecorder, request)
+			if responseRecorder.Code != ts.statusCode {
+				t.Errorf("Expected status code %d, not HTTP %d", ts.statusCode, responseRecorder.Code)
+				return
+			}
+
+			if responseRecorder.Code != http.StatusOK {
+				var errCode response.Message
+				json.Unmarshal(responseRecorder.Body.Bytes(), &errCode)
+				if errCode.ResponseCode != ts.expectRespCode {
+					t.Errorf("Expected response code '%s', got '%s - %s'", ts.expectRespCode, errCode.ResponseCode, errCode.ResponseMessage)
+					return
+				}
+			}
+
+			// take single todo ID for later use on scenario get single data todo
+			var data []*database.TableTodos
+			json.Unmarshal(responseRecorder.Body.Bytes(), &data)
+			if len(data) > 0 {
+				tempID = data[0].ID
+			}
+		})
+	}
+}
+
 func TestAddTodo(t *testing.T) {
 	now := time.Now()
 	endpoint := "/v1.0/todo"

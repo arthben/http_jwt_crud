@@ -39,7 +39,7 @@ func CloseDatabase(db *sqlx.DB) error {
 }
 
 func ListTodo(db *sqlx.DB, ctx context.Context, id string) ([]*TableTodos, error) {
-	var args []string
+	var args []interface{}
 
 	sql := `SELECT id, title, detail, 
 			CONCAT('', created_date) AS created_date, 
@@ -55,7 +55,7 @@ func ListTodo(db *sqlx.DB, ctx context.Context, id string) ([]*TableTodos, error
 	sql = strings.Join([]string{sql, "ORDER BY updated_date DESC"}, " ")
 
 	resp := []*TableTodos{}
-	err := db.SelectContext(ctx, &resp, sql, args)
+	err := db.SelectContext(ctx, &resp, sql, args...)
 	return resp, err
 }
 
