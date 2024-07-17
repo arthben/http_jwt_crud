@@ -94,4 +94,3 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/http_jwt_crud:latest
-
